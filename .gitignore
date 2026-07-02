@@ -17,6 +17,7 @@ output/model/
 
 # Dynamic Outputs
 output/sampling/
+output/debugging/
 *_output_parsed.json
 output_parsed*.json
 
