@@ -2,7 +2,7 @@ import os
 import glob
 
 def baca_semua_sample():
-    path_folder = os.path.join("data-sample", "text-base", "*.txt")
+    path_folder = os.path.join("input", "sampling", "text-base", "*.txt")
     files = glob.glob(path_folder)
 
     print(f"Menemukan {len(files)} file sample untuk diproses.\n")

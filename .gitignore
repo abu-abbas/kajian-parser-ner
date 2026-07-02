@@ -13,10 +13,10 @@ env/
 
 # SpaCy Binary Data & Models
 *.spacy
-output_model/
+output/model/
 
 # Dynamic Outputs
-output-sample/
+output/sampling/
 *_output_parsed.json
 output_parsed*.json
 

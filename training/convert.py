@@ -88,7 +88,7 @@ def main():
     print("   2. Generate training config:")
     print("      python -m spacy init config config.cfg --pipeline ner --lang id --force")
     print("   3. Run training:")
-    print("      python -m spacy train training/config.cfg --output ./output_model --paths.train ./training/train.spacy --paths.dev ./training/dev.spacy")
+    print("      python -m spacy train training/config.cfg --output ./output/model --paths.train ./training/train.spacy --paths.dev ./training/dev.spacy")
     print("=" * 60)
 
 if __name__ == "__main__":

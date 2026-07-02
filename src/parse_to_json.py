@@ -276,7 +276,7 @@ def main():
         output_path = sys.argv[2]
     else:
         # Generate default name under output-sample/ directory
-        out_dir = "output-sample"
+        out_dir = "output/sampling"
         if not os.path.exists(out_dir):
             os.makedirs(out_dir)
         base_name = os.path.splitext(os.path.basename(input_path))[0]
@@ -303,7 +303,7 @@ def main():
         log(f"Error: Input file '{input_path}' not found.")
         sys.exit(1)
         
-    model_path = "output_model/model-best"
+    model_path = "output/model/model-best"
     if not os.path.exists(model_path):
         log(f"Error: Model not found at '{model_path}'. Please train the model first.")
         sys.exit(1)

@@ -14,13 +14,13 @@ def main():
     if len(sys.argv) > 1:
         fpath = sys.argv[1]
     else:
-        fpath = "data-sample/text-base/sample-dataset-01.txt"
+        fpath = "input/sampling/text-base/sample-dataset-01.txt"
 
     if not os.path.exists(fpath):
         print(f"Error: File not found at {fpath}")
         sys.exit(1)
 
-    model_path = "output_model/model-best"
+    model_path = "output/model/model-best"
     if not os.path.exists(model_path):
         print(f"Error: Model not found at {model_path}. Please run training first.")
         sys.exit(1)

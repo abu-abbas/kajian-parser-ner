@@ -4,7 +4,7 @@
 generate_dataset.py
 ═══════════════════
 Workflow /build-dataset — Steps 1–4
-Processes text files from data-sample/text-base/ into SpaCy NER TRAIN_DATA.
+Processes text files from input/sampling/text-base/ into SpaCy NER TRAIN_DATA.
 
 Rules (@aturan-kurasi-kajian):
   1. Kebal Typo: Keep OCR/text typos as-is (e.g. 'U5tadz', 'AkAkhwat')
@@ -28,7 +28,7 @@ import sys
 # Step 1: Ingestion — Read all .txt files
 # ═════════════════════════════════════════════════════════════
 
-def read_all_files(folder="data-sample/text-base"):
+def read_all_files(folder="input/sampling/text-base"):
     """Read all non-empty .txt files from the folder."""
     files = sorted(glob.glob(os.path.join(folder, "*.txt")))
     result = {}
