@@ -1088,4 +1088,69 @@ TRAIN_DATA = [
             (273, 290, "KONTAK"),  # '0818-0730-6269 🚹🚺'
         ]}
     ),
+
+    # ── Entry 79 ──
+    (
+        "⏰ Ba'da Shubuh - Selesai\n📚 Tazkiyatun Nafs\n👤 Ustadz Abdul Rauf Abu Nida, حفظه الله\n📍 Masjid An-Nur, Jl. Diponegoro No. 12, Kel. Tegalsari, Kec. Tegalsari, Surabaya\n🔗 https://maps.app.goo.gl/9RME3aZ9KjSvYNzN7",
+        {"entities": [
+            (2, 24, "WAKTU"),  # "Ba'da Shubuh - Selesai"
+            (27, 42, "TEMA"),  # 'Tazkiyatun Nafs'
+            (45, 71, "PEMATERI"),  # 'Ustadz Abdul Rauf Abu Nida'
+            (85, 98, "LOKASI"),  # 'Masjid An-Nur'
+            (100, 163, "ALAMAT"),  # 'Jl. Diponegoro No. 12, Kel. Tegalsari, Kec. Tegalsari, Surab'
+            (166, 207, "LINK_STREAMING"),  # 'https://maps.app.goo.gl/9RME3aZ9KjSvYNzN7'
+        ]}
+    ),
+
+    # ── Entry 80 ──
+    (
+        "⏰ Ba'da Shubuh - Selesai\n📚 Tazkiyatun Nafs\n👤 Ustadz Abdul Rauf Abu Nida, حفظه الله\n📍 Masjid Al-Barkah, Jl. Slamet Riyadi No. 5, Laweyan, Surakarta\n🔗 https://maps.app.goo.gl/9RME3aZ9KjSvYNzN7",
+        {"entities": [
+            (2, 24, "WAKTU"),  # "Ba'da Shubuh - Selesai"
+            (27, 42, "TEMA"),  # 'Tazkiyatun Nafs'
+            (45, 71, "PEMATERI"),  # 'Ustadz Abdul Rauf Abu Nida'
+            (85, 101, "LOKASI"),  # 'Masjid Al-Barkah'
+            (103, 146, "ALAMAT"),  # 'Jl. Slamet Riyadi No. 5, Laweyan, Surakarta'
+            (149, 190, "LINK_STREAMING"),  # 'https://maps.app.goo.gl/9RME3aZ9KjSvYNzN7'
+        ]}
+    ),
+
+    # ── Entry 81 ──
+    (
+        "⏰ Ba'da Shubuh - Selesai\n📚 Tazkiyatun Nafs\n👤 Ustadz Abdul Rauf Abu Nida, حفظه الله\n📍 Musholla At-Taqwa, Jl. Pemuda No. 45, Sekayu, Kec. Semarang Tengah, Kota Semarang\n🔗 https://maps.app.goo.gl/9RME3aZ9KjSvYNzN7",
+        {"entities": [
+            (2, 24, "WAKTU"),  # "Ba'da Shubuh - Selesai"
+            (27, 42, "TEMA"),  # 'Tazkiyatun Nafs'
+            (45, 71, "PEMATERI"),  # 'Ustadz Abdul Rauf Abu Nida'
+            (85, 102, "LOKASI"),  # 'Musholla At-Taqwa'
+            (104, 166, "ALAMAT"),  # 'Jl. Pemuda No. 45, Sekayu, Kec. Semarang Tengah, Kota Semara'
+            (169, 210, "LINK_STREAMING"),  # 'https://maps.app.goo.gl/9RME3aZ9KjSvYNzN7'
+        ]}
+    ),
+
+    # ── Entry 82 ──
+    (
+        "⏰ Ba'da Shubuh - Selesai\n📚 Tazkiyatun Nafs\n👤 Ustadz Abdul Rauf Abu Nida, حفظه الله\n📍 Masjid Istiqlal, Jl. Taman Wijaya Kusuma, Pasar Baru, Kec. Sawah Besar, Kota Jakarta Pusat\n🔗 https://maps.app.goo.gl/9RME3aZ9KjSvYNzN7",
+        {"entities": [
+            (2, 24, "WAKTU"),  # "Ba'da Shubuh - Selesai"
+            (27, 42, "TEMA"),  # 'Tazkiyatun Nafs'
+            (45, 71, "PEMATERI"),  # 'Ustadz Abdul Rauf Abu Nida'
+            (85, 100, "LOKASI"),  # 'Masjid Istiqlal'
+            (102, 175, "ALAMAT"),  # 'Jl. Taman Wijaya Kusuma, Pasar Baru, Kec. Sawah Besar, Kota '
+            (178, 219, "LINK_STREAMING"),  # 'https://maps.app.goo.gl/9RME3aZ9KjSvYNzN7'
+        ]}
+    ),
+
+    # ── Entry 83 ──
+    (
+        "⏰ Ba'da Shubuh - Selesai\n📚 Tazkiyatun Nafs\n👤 Ustadz Abdul Rauf Abu Nida, حفظه الله\n📍 Masjid Raya Baiturrahman, Jl. Moh. Jam No.1, Kampung Baru, Kec. Baiturrahman, Kota Banda Aceh\n🔗 https://maps.app.goo.gl/9RME3aZ9KjSvYNzN7",
+        {"entities": [
+            (2, 24, "WAKTU"),  # "Ba'da Shubuh - Selesai"
+            (27, 42, "TEMA"),  # 'Tazkiyatun Nafs'
+            (45, 71, "PEMATERI"),  # 'Ustadz Abdul Rauf Abu Nida'
+            (85, 109, "LOKASI"),  # 'Masjid Raya Baiturrahman'
+            (111, 178, "ALAMAT"),  # 'Jl. Moh. Jam No.1, Kampung Baru, Kec. Baiturrahman, Kota Ban'
+            (181, 222, "LINK_STREAMING"),  # 'https://maps.app.goo.gl/9RME3aZ9KjSvYNzN7'
+        ]}
+    ),
 ]

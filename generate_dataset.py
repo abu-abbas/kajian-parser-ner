@@ -700,6 +700,31 @@ def verify_train_data(all_data):
     return errors
 
 
+def synthesize_comma_separated_variations(all_data):
+    """Generates synthetic examples of comma-separated LOKASI and ALAMAT."""
+    synthetic_data = []
+    for session, entities in all_data:
+        if "Masjid al-Ikhlash" in session and ", Jl." in session:
+            variations = [
+                ("Masjid An-Nur", "Jl. Diponegoro No. 12, Kel. Tegalsari, Kec. Tegalsari, Surabaya"),
+                ("Masjid Al-Barkah", "Jl. Slamet Riyadi No. 5, Laweyan, Surakarta"),
+                ("Musholla At-Taqwa", "Jl. Pemuda No. 45, Sekayu, Kec. Semarang Tengah, Kota Semarang"),
+                ("Masjid Istiqlal", "Jl. Taman Wijaya Kusuma, Pasar Baru, Kec. Sawah Besar, Kota Jakarta Pusat"),
+                ("Masjid Raya Baiturrahman", "Jl. Moh. Jam No.1, Kampung Baru, Kec. Baiturrahman, Kota Banda Aceh"),
+            ]
+            for loc_name, addr_name in variations:
+                old_loc = "Masjid al-Ikhlash - Delta Sari Indah"
+                old_addr = "Jl. Anggrek VI no.36-38, Kureksari, Waru, Sidoarjo"
+                
+                new_session = session.replace(old_loc, loc_name).replace(old_addr, addr_name)
+                new_entities = _extract_sample13(new_session)
+                new_entities = validate_and_clean(new_session, new_entities)
+                if new_entities:
+                    synthetic_data.append((new_session, new_entities))
+            break
+    return synthetic_data
+
+
 # ═════════════════════════════════════════════════════════════
 # Main
 # ═════════════════════════════════════════════════════════════
@@ -729,6 +754,12 @@ def main():
                 all_data.append((session, entities))
                 labels = sorted(set(l for _, _, l in entities))
                 print(f"      #{j+1:>2d}: {len(entities)} entities {labels}")
+
+    # ── Data Augmentation ──
+    synthetic_vars = synthesize_comma_separated_variations(all_data)
+    if synthetic_vars:
+        print(f"\n➕ Added {len(synthetic_vars)} synthetic comma-separated location variations for training")
+        all_data.extend(synthetic_vars)
 
     # ── Verification ──
     print("\n🔍 Verification:")

@@ -281,6 +281,17 @@ def main():
             os.makedirs(out_dir)
         base_name = os.path.splitext(os.path.basename(input_path))[0]
         output_path = os.path.join(out_dir, f"{base_name}_output_parsed.json")
+        
+        # If the file already exists, append _01.json, _02.json, etc.
+        if os.path.exists(output_path):
+            counter = 1
+            while True:
+                candidate_name = f"{base_name}_output_parsed_{counter:02d}.json"
+                candidate_path = os.path.join(out_dir, candidate_name)
+                if not os.path.exists(candidate_path):
+                    output_path = candidate_path
+                    break
+                counter += 1
     
     def log(msg):
         if output_path == "-":

@@ -54,6 +54,7 @@ Jalankan script `parse_to_json.py` dengan memberikan path file input teks rekap.
   ```bash
   python parse_to_json.py data-sample/text-base/sample-dataset-rekap-kajian-kaskus.txt
   # Output akan tersimpan di output-sample/sample-dataset-rekap-kajian-kaskus_output_parsed.json
+  # Jika file tersebut sudah ada, otomatis menambahkan counter (contoh: ..._parsed_01.json) agar tidak overwrite.
   ```
 
 * **Menyimpan ke file/path spesifik:**
