@@ -15,7 +15,7 @@ Rules (@aturan-kurasi-kajian):
 
 Usage:
     source venv/bin/activate
-    python generate_dataset.py
+    python training/generate_dataset.py
 """
 
 import re
@@ -645,7 +645,7 @@ def validate_and_clean(text, entities):
 # Step 4: Export — Write TRAIN_DATA to Python file
 # ═════════════════════════════════════════════════════════════
 
-def export_train_data(all_data, output_path="data_latihan_spacy.py"):
+def export_train_data(all_data, output_path="training/data_latihan_spacy.py"):
     """Write all training data as a Python file with TRAIN_DATA variable."""
     with open(output_path, "w", encoding="utf-8") as f:
         f.write('# -*- coding: utf-8 -*-\n')
@@ -783,7 +783,7 @@ def main():
     print("=" * 60)
     print("\n🎯 Done! Jalankan di venv:")
     print("   source venv/bin/activate")
-    print("   python generate_dataset.py")
+    print("   python training/generate_dataset.py")
 
 
 if __name__ == "__main__":

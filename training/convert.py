@@ -10,7 +10,11 @@ import os
 import random
 import spacy
 from spacy.tokens import DocBin
-from data_latihan_spacy import TRAIN_DATA
+
+try:
+    from data_latihan_spacy import TRAIN_DATA
+except ImportError:
+    from training.data_latihan_spacy import TRAIN_DATA
 
 def convert(data, output_path, nlp):
     db = DocBin()
@@ -72,10 +76,10 @@ def main():
 
     # 4. Convert and save
     print("🔄 Converting Train set...")
-    convert(train_data, "train.spacy", nlp)
+    convert(train_data, "training/train.spacy", nlp)
     
     print("🔄 Converting Dev set...")
-    convert(dev_data, "dev.spacy", nlp)
+    convert(dev_data, "training/dev.spacy", nlp)
     
     print("=" * 60)
     print("🎯 Preparation Complete! Next steps:")
@@ -84,7 +88,7 @@ def main():
     print("   2. Generate training config:")
     print("      python -m spacy init config config.cfg --pipeline ner --lang id --force")
     print("   3. Run training:")
-    print("      python -m spacy train config.cfg --output ./output_model --paths.train ./train.spacy --paths.dev ./dev.spacy")
+    print("      python -m spacy train training/config.cfg --output ./output_model --paths.train ./training/train.spacy --paths.dev ./training/dev.spacy")
     print("=" * 60)
 
 if __name__ == "__main__":

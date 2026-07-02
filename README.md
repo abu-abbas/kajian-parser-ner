@@ -24,11 +24,16 @@ Proyek ini adalah parser jadwal kajian Islam berbasis kecerdasan buatan mengguna
 
 ## Struktur Proyek
 
-* `parse_to_json.py` — Script parser utama untuk memisahkan sesi, menjalankan inference SpaCy, dan mengekspor output JSON.
-* `generate_dataset.py` — Script pembuat dataset latih dengan melabeli teks sampel secara otomatis menggunakan regex.
-* `convert.py` — Mengonversi dataset latih python menjadi format biner `.spacy` untuk training.
-* `predict.py` — Utilitas sederhana untuk menguji prediksi model secara cepat via CLI.
-* `config.cfg` — File konfigurasi pipeline training SpaCy.
+* **`src/`** — Kode program utama untuk produksi:
+  * `parse_to_json.py` — Script parser utama untuk memisahkan sesi, menjalankan inference SpaCy, dan mengekspor output JSON.
+  * `predict.py` — Utilitas sederhana untuk menguji prediksi model secara cepat via CLI.
+* **`training/`** — Program pendukung untuk pembuatan dataset & training model:
+  * `generate_dataset.py` — Script pembuat dataset latih dengan melabeli teks sampel secara otomatis menggunakan regex.
+  * `convert.py` — Mengonversi dataset latih python menjadi format biner `.spacy` untuk training.
+  * `build_dataset.py` — Script pembaca dataset rekap mentah lokal.
+  * `config.cfg` — File konfigurasi pipeline training SpaCy.
+  * `data_latihan_spacy.py` — Dataset latih format Python list (auto-generated).
+  * `train.spacy` & `dev.spacy` — Binary dataset untuk SpaCy training (auto-generated).
 * `data-sample/` — Folder berisi dataset rekap mentah (`.txt`).
 * `output-sample/` — Direktori penyimpanan output JSON terstruktur.
 * `output_model/` — Direktori penyimpanan model SpaCy hasil training (`model-best` & `model-last`).
@@ -48,40 +53,40 @@ pip install spacy
 ```
 
 ### 2. Menjalankan Parser
-Jalankan script `parse_to_json.py` dengan memberikan path file input teks rekap.
+Jalankan script `src/parse_to_json.py` dengan memberikan path file input teks rekap.
 
 * **Menyimpan otomatis ke `output-sample/` (Rekomendasi):**
   ```bash
-  python parse_to_json.py data-sample/text-base/sample-dataset-rekap-kajian-kaskus.txt
+  python src/parse_to_json.py data-sample/text-base/sample-dataset-rekap-kajian-kaskus.txt
   # Output akan tersimpan di output-sample/sample-dataset-rekap-kajian-kaskus_output_parsed.json
   # Jika file tersebut sudah ada, otomatis menambahkan counter (contoh: ..._parsed_01.json) agar tidak overwrite.
   ```
 
 * **Menyimpan ke file/path spesifik:**
   ```bash
-  python parse_to_json.py data-sample/text-base/sample-dataset-rekap-kajian-kaskus.txt hasil_kaskus.json
+  python src/parse_to_json.py data-sample/text-base/sample-dataset-rekap-kajian-kaskus.txt hasil_kaskus.json
   ```
 
 * **Menampilkan langsung di terminal (stdout):**
   ```bash
-  python parse_to_json.py data-sample/text-base/sample-dataset-rekap-kajian-kaskus.txt -
+  python src/parse_to_json.py data-sample/text-base/sample-dataset-rekap-kajian-kaskus.txt -
   ```
 
 ---
 
 ## Panduan Training Ulang Model (Retraining)
 
-Jika Anda melakukan perubahan pola ekstraksi pada `generate_dataset.py` untuk menambah performa model, lakukan langkah training ulang berikut:
+Jika Anda melakukan perubahan pola ekstraksi pada `training/generate_dataset.py` untuk menambah performa model, lakukan langkah training ulang berikut:
 
 ```bash
-# 1. Regenerasi data latihan baru (menghasilkan data_latihan_spacy.py)
-python generate_dataset.py
+# 1. Regenerasi data latihan baru (menghasilkan training/data_latihan_spacy.py)
+python training/generate_dataset.py
 
-# 2. Konversi ulang menjadi format biner train.spacy dan dev.spacy
-python convert.py
+# 2. Konversi ulang menjadi format biner training/train.spacy dan training/dev.spacy
+python training/convert.py
 
 # 3. Jalankan training ulang model SpaCy
-python -m spacy train config.cfg --output ./output_model --paths.train ./train.spacy --paths.dev ./dev.spacy
+python -m spacy train training/config.cfg --output ./output_model --paths.train ./training/train.spacy --paths.dev ./training/dev.spacy
 ```
 
 SpaCy secara otomatis akan menimpa model lama di folder `./output_model/model-best` dengan model terbaik yang baru.
