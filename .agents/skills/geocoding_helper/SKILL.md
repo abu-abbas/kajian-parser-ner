@@ -14,4 +14,4 @@ description: Skill khusus untuk memvalidasi alamat mentah hasil parser dan mengu
 - Gunakan fallback value atau pastikan properti krusial seperti `latitude` dan `longitude` bertipe data `float` atau `null` (jangan biarkan kosong atau bertipe string).
 
 ## Cara Penggunaan Script Helper:
-- Jalankan script `clean_geo.py` di dalam folder ini untuk memvalidasi string alamat secara lokal sebelum melakukan hit ke API.
+- Jalankan script `.agents/skills/geocoding_helper/scripts/clean_geo.py` di dalam folder ini untuk memvalidasi string alamat secara lokal sebelum melakukan hit ke API.
