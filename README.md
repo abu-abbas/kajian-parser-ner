@@ -32,7 +32,12 @@ Proyek ini adalah parser jadwal kajian Islam berbasis kecerdasan buatan mengguna
   * `predict.py` — Utilitas sederhana untuk menguji prediksi model secara cepat via CLI.
   * `debug_ner.py` — Script utility untuk menganalisis dan mendebug hasil deteksi NER per berkas dan menyimpannya di folder `output/debugging/`.
 * **`training/`** — Program pendukung untuk pembuatan dataset & training model:
-  * `data_latihan_spacy.py` — Dataset latih format Python list terkurasi dengan exact substring matching dinamis (mencegah *off-by-one errors*).
+  * `generate_dataset_via_llm.py` — Script pembuat dataset NER menggunakan LLM API (Gemini/Qwen) dilengkapi fitur caching file dan opsi pemrosesan berkas sampel spesifik.
+  * `generate_dataset.py` — Script pembuat dataset NER menggunakan pemrosesan aturan Regex tradisional.
+  * `generate_dataset_relations.py` — Script pembuat dataset relasi RE berbasis relasi spasial logis dari entitas terdeteksi.
+  * `generate_perfect_dataset.py` — Script generator dataset acuan referensi terkurasi sempurna.
+  * `build_dataset.py` — Script ingestion dasar untuk membaca file teks mentah sampel.
+  * `data_latihan_spacy.py` — Dataset latih format Python list hasil ekstraksi NER terkurasi dengan exact substring matching.
   * `data_latihan_relations.jsonl` — Dataset latih relasi dalam format JSONL untuk pelatihan Relation Extraction.
   * `rel_component.py` — Kode komponen kustom (*custom component*) untuk mendaftarkan neural network relasi ke dalam sistem SpaCy v3.
   * `convert.py` — Mengonversi dataset latih NER python menjadi format biner `train.spacy` dan `dev.spacy`.
@@ -42,7 +47,9 @@ Proyek ini adalah parser jadwal kajian Islam berbasis kecerdasan buatan mengguna
 * `input/sampling/` — Folder berisi dataset rekap mentah (`.txt`).
 * `output/sampling/` — Direktori penyimpanan output JSON terstruktur.
 * `output/debugging/` — Direktori penyimpanan hasil log debugging parser.
-* `output/model/` — Direktori penyimpanan model SpaCy hasil training (`model-best` & `model-last`).
+* `output/llm_tmp/` — Direktori penyimpanan cache berkas respon mentah JSON dari panggilan LLM API.
+* `output/model_ner/` — Direktori penyimpanan model hasil training SpaCy NER-only.
+* `output/model_rel/` — Direktori penyimpanan model hasil training SpaCy Joint NER + RE.
 
 ---
 
