@@ -18,6 +18,9 @@ output/model/
 # Dynamic Outputs
 output/sampling/
 output/debugging/
+output/llm_tmp/
+output/model_ner/
+output/model_rel/
 *_output_parsed.json
 output_parsed*.json
 
@@ -26,3 +29,7 @@ output_parsed*.json
 
 # IDEs
 .vscode/
+
+# Environment Variables
+.env
+

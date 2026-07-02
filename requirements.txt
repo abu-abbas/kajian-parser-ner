@@ -3,3 +3,5 @@ uvicorn
 spacy>=3.8.11
 pydantic
 python-multipart
+google-generativeai
+python-dotenv

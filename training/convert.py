@@ -25,7 +25,9 @@ def convert(data, output_path, nlp):
     skipped = 0
     success = 0
     for i, (text, annot) in enumerate(data):
-        doc = nlp.make_doc(text)
+        # Clean surrogate characters (0xD800 - 0xDFFF) to prevent SpaCy UnicodeEncodeError
+        text_clean = "".join(c for c in text if not (0xD800 <= ord(c) <= 0xDFFF))
+        doc = nlp.make_doc(text_clean)
         ents = []
         for start, end, label in annot["entities"]:
             # Create a span in the doc

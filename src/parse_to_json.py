@@ -8,6 +8,7 @@ Uses the trained SpaCy model to extract entities and groups them per session.
 """
 
 import sys
+import argparse
 import os
 import re
 import json
@@ -45,6 +46,32 @@ def _split_sample13_sessions(text):
         sessions.append(donation_block)
     return sessions
 
+def _split_batam(text):
+    """Split Batam rekap: sessions are blocks starting with a line like *MASJID...* or *MUSHOLLA...*"""
+    # Pattern to match starting of a masjid or musholla block
+    pattern = r'(?=\*(?:MASJID|MUSHOLLA|KAJIAN)\s+[^*]+\*)'
+    blocks = re.split(pattern, text)
+    
+    header = ""
+    # Check if first block contains date header
+    first_block = blocks[0].strip()
+    if not (first_block.startswith("*MASJID") or first_block.startswith("*MUSHOLLA") or first_block.startswith("*KAJIAN")):
+        header = first_block
+        blocks = blocks[1:]
+        
+    final_blocks = []
+    for b in blocks:
+        b_strip = b.strip()
+        if b_strip:
+            if "TIDAK ADA KAJIAN" in b_strip:
+                continue
+            # Context Injection: inject date header context at the top of each block
+            if header:
+                final_blocks.append(header + "\n\n" + b_strip)
+            else:
+                final_blocks.append(b_strip)
+    return final_blocks
+
 def split_sessions_by_content(text, filename=""):
     """Detect file format based on content, split it into sessions, and handle sub-sessions."""
     text_clean = text.strip()
@@ -57,10 +84,14 @@ def split_sessions_by_content(text, filename=""):
         raw_sessions = _split_kaskus(text_clean)
     elif "13" in fn:
         raw_sessions = _split_sample13_sessions(text_clean)
+    elif "03" in fn:
+        raw_sessions = _split_batam(text_clean)
     else:
         # Priority 2: Content patterns
         if "》Pemateri" in text or "》Tema" in text:
             raw_sessions = _split_kaskus(text_clean)
+        elif "JADWAL KAJIAN SUNNAH KOTA BATAM" in text:
+            raw_sessions = _split_batam(text_clean)
         elif text_clean.startswith("⏰") or "\n⏰" in text:
             # Check if Surabaya Mengaji (sample-dataset-13) or Gresik
             if "Surabaya Mengaji" in text or "💳" in text:
@@ -71,7 +102,7 @@ def split_sessions_by_content(text, filename=""):
             # Fallback: Single session (whole text)
             raw_sessions = [text_clean]
             
-    # Sub-split sessions that contain multiple "- SESI X" blocks
+    # Sub-split sessions that contain multiple sub-session blocks (e.g. - SESI X or Batam sub-sessions)
     final_sessions = []
     for s in raw_sessions:
         if re.search(r'-\s*SESI\s*\d+', s, flags=re.IGNORECASE):
@@ -82,6 +113,14 @@ def split_sessions_by_content(text, filename=""):
                 sesi_content = parts[i+1]
                 combined = header.strip() + "\n" + sesi_title + "\n" + sesi_content.strip()
                 final_sessions.append(combined)
+        elif len(re.findall(r'(?:Kajian\s+Ba\'da|(?<!Kajian\s)Ba\'da)\s+(?:Subuh|Dzuhur|Ashar|Maghrib|Isya)', s, flags=re.IGNORECASE)) > 1:
+            # Batam sub-splitting using lookahead with negative lookbehind
+            parts = re.split(r'(?=(?:Kajian\s+Ba\'da|(?<!Kajian\s)Ba\'da)\s+(?:Subuh|Dzuhur|Ashar|Maghrib|Isya))', s, flags=re.IGNORECASE)
+            header = parts[0]
+            for sub_content in parts[1:]:
+                if sub_content.strip():
+                    combined = header.strip() + "\n\n" + sub_content.strip()
+                    final_sessions.append(combined)
         else:
             final_sessions.append(s)
             
@@ -122,7 +161,6 @@ def extract_address_from_text(text):
     return None
 
 
-
 def structure_session(doc) -> dict[str, Any]:
     """Convert SpaCy doc entities into a structured dictionary."""
     session_data: dict[str, Any] = {
@@ -132,7 +170,9 @@ def structure_session(doc) -> dict[str, Any]:
         "waktu": None,
         "lokasi": None,
         "alamat": None,
-        "status": None,
+        "link_maps": None,
+        "metode": "offline",
+        "kategori": None,
         "kontak": [],
         "link_streaming": [],
         "taradhi": [],
@@ -155,9 +195,11 @@ def structure_session(doc) -> dict[str, Any]:
     waktus = []
     lokasis = []
     alamats = []
-    statuses = []
+    kategoris = []
     banks = []
     noreks = []
+    link_maps_list = []
+    metodes = []
     
     # Specific keywords to filter out false-positive TEMA entities
     disclaimer_keywords = [
@@ -184,17 +226,30 @@ def structure_session(doc) -> dict[str, Any]:
         elif label == "WAKTU":
             waktus.append(val)
         elif label == "LOKASI":
-            lokasis.append(val)
-        elif label == "STATUS":
-            statuses.append(val)
+            # Jika lokasi terdeteksi online platform, masukkan ke METODE
+            if val.upper() in ["ZOOM", "GOOGLE MEET", "MEET", "YOUTUBE"]:
+                metodes.append(val)
+            else:
+                lokasis.append(val)
+        elif label == "KATEGORI" or label == "STATUS":
+            kategoris.append(val)
         elif label == "KONTAK":
-            # Clean up trailing/leading symbols or whitespaces from contact numbers
-            cleaned_kontak = re.sub(r'[^\d\s\-\+/a-zA-Z]', '', val).strip()
-            if cleaned_kontak and cleaned_kontak not in session_data["kontak"]:
-                session_data["kontak"].append(cleaned_kontak)
+            # Clean up and split multiple contact numbers in the same string
+            parts = re.split(r'[\s/]+', val)
+            for part in parts:
+                cleaned_kontak = re.sub(r'[^\d\+\-]', '', part).strip()
+                if len(re.sub(r'[^\d]', '', cleaned_kontak)) >= 9:
+                    if cleaned_kontak not in session_data["kontak"]:
+                        session_data["kontak"].append(cleaned_kontak)
         elif label == "LINK_STREAMING":
             if val not in session_data["link_streaming"]:
                 session_data["link_streaming"].append(val)
+        elif label == "LINK_MAPS":
+            # Validate that it is indeed a URL or maps link to avoid statistical leaks
+            if any(k in val.lower() for k in ["http", "https", "maps", "goo.gl", "bit.ly"]):
+                link_maps_list.append(val)
+        elif label == "METODE":
+            metodes.append(val)
         elif label == "TARADHI":
             if val not in session_data["taradhi"]:
                 session_data["taradhi"].append(val)
@@ -203,8 +258,9 @@ def structure_session(doc) -> dict[str, Any]:
         elif label == "BANK":
             banks.append(val)
         elif label == "NOREK":
-            # Clean up non-digit numbers
-            cleaned_norek = re.sub(r'[^\d]', '', val)
+            # Clean up non-digit numbers, limit to first line to prevent leakage to contacts below
+            first_line = val.split('\n')[0].strip()
+            cleaned_norek = re.sub(r'[^\d]', '', first_line)
             if cleaned_norek:
                 noreks.append(cleaned_norek)
             
@@ -221,8 +277,14 @@ def structure_session(doc) -> dict[str, Any]:
         session_data["alamat"] = " / ".join(alamats) if len(alamats) > 1 else alamats[0]
     else:
         session_data["alamat"] = fallback_address
-    if statuses:
-        session_data["status"] = " / ".join(statuses) if len(statuses) > 1 else statuses[0]
+        
+    if link_maps_list:
+        session_data["link_maps"] = link_maps_list[0]
+    if metodes:
+        session_data["metode"] = metodes[0]
+        
+    if kategoris:
+        session_data["kategori"] = " / ".join(kategoris) if len(kategoris) > 1 else kategoris[0]
         
     if banks:
         session_data["bank_transfer"]["bank"] = banks[0]
@@ -258,8 +320,54 @@ def structure_session(doc) -> dict[str, Any]:
     if not session_data["lokasi"]:
         session_data["lokasi"] = extract_by_emoji(['📍', '🕌', '🏢', '🏡', '🏠'])
         
-
+    if not session_data["kategori"]:
+        session_data["kategori"] = extract_by_emoji(['🚨'])
+        
+    # Fallback to extract link maps from text if link_maps is None
+    if not session_data["link_maps"]:
+        maps_match = re.search(r'(https?://(?:maps\.google\.com|goo\.gl/maps|maps\.app\.goo\.gl)\S*)', doc.text)
+        if maps_match:
+            session_data["link_maps"] = maps_match.group(1)
+        else:
+            bitly_match = re.search(r'(http://bit\.ly/(?:ahmaddahlangresik|AtTauhid_Betiting|AlJihad_Cerme|PSofyan_Driyorejo))', doc.text)
+            if bitly_match:
+                session_data["link_maps"] = bitly_match.group(1)
+                
+    # Fallback contact numbers based on phone/whatsapp emojis
+    if not session_data["kontak"]:
+        contact_matches = re.findall(fr'^(?:📱|📞|☎️|📲)\ufe0f?\s*(.+)$', doc.text, re.MULTILINE)
+        for val in contact_matches:
+            parts = re.split(r'[\s/]+', val)
+            for part in parts:
+                cleaned = re.sub(r'[^\d\+\-]', '', part).strip()
+                if len(re.sub(r'[^\d]', '', cleaned)) >= 9:
+                    if cleaned not in session_data["kontak"]:
+                        session_data["kontak"].append(cleaned)
+                        
+    # Fallback bank transfer info (bank & norek)
+    if not session_data["bank_transfer"]["bank"]:
+        bank_match = re.search(r'\b(BSI|BANK\s+SYARIAH\s+INDONESIA|MANDIRI|BCA|BRI|BANK\s+MUAMALAT|MUAMALAT)\b', doc.text, re.IGNORECASE)
+        if bank_match:
+            session_data["bank_transfer"]["bank"] = bank_match.group(1).upper()
             
+    if not session_data["bank_transfer"]["norek"] or len(session_data["bank_transfer"]["norek"]) > 25:
+        norek_match = re.search(r'(?:No\.\s*Rek\s*:\s*|No\s*rekening\s*:\s*|BSI\s*-\s*)([\d\s]+)', doc.text, re.IGNORECASE)
+        if norek_match:
+            raw_norek = norek_match.group(1).split('\n')[0].strip()
+            cleaned_norek = re.sub(r'[^\d]', '', raw_norek)
+            if cleaned_norek:
+                session_data["bank_transfer"]["norek"] = cleaned_norek
+                
+    # Fallback online detection
+    if session_data["metode"] == "offline":
+        if any(kw in doc.text.upper() for kw in ["ZOOM", "GOOGLE MEET", "MEET", "YOUTUBE LIVE", "LIVE YOUTUBE"]):
+            for kw in ["ZOOM", "GOOGLE MEET", "MEET", "YOUTUBE"]:
+                if kw in doc.text.upper():
+                    session_data["metode"] = kw
+                    break
+            if session_data["metode"] == "offline":
+                session_data["metode"] = "online"
+                
     return session_data
 
 # ═════════════════════════════════════════════════════════════
@@ -267,15 +375,17 @@ def structure_session(doc) -> dict[str, Any]:
 # ═════════════════════════════════════════════════════════════
 
 def main():
-    if len(sys.argv) < 2:
-        print("Usage: python parse_to_json.py <input_text_file> [output_json_file]")
-        sys.exit(1)
-        
-    input_path = sys.argv[1]
+    parser = argparse.ArgumentParser(description="AI Parser Jadwal Kajian (SpaCy)")
+    parser.add_argument("input_file", help="Path ke berkas teks rekap input (.txt)")
+    parser.add_argument("output_file", nargs="?", default=None, help="Path ke berkas output JSON (default: output/sampling/..._parsed.json)")
+    parser.add_argument("--use-rel", action="store_true", help="Gunakan model Joint NER + Relation Extraction (default: model NER)")
     
-    if len(sys.argv) > 2:
-        output_path = sys.argv[2]
-    else:
+    args = parser.parse_args()
+    input_path = args.input_file
+    output_path = args.output_file
+    use_rel = args.use_rel
+    
+    if output_path is None:
         # Generate default name under output-sample/ directory
         out_dir = "output/sampling"
         if not os.path.exists(out_dir):
@@ -304,12 +414,30 @@ def main():
         log(f"Error: Input file '{input_path}' not found.")
         sys.exit(1)
         
-    model_path = "output/model/model-best"
+    if use_rel:
+        model_path = "output/model_rel/model-best"
+    else:
+        model_path = "output/model_ner/model-best"
+        
     if not os.path.exists(model_path):
         log(f"Error: Model not found at '{model_path}'. Please train the model first.")
         sys.exit(1)
         
     log(f"🤖 Loading SpaCy model from: {model_path} ...")
+    
+    # Coba impor custom component Relation Extraction secara dinamis
+    # agar registry SpaCy mengenali 'relation_extractor' jika model adalah Joint NER + RE.
+    try:
+        src_dir = os.path.dirname(os.path.abspath(__file__))
+        project_root = os.path.dirname(src_dir)
+        training_dir = os.path.join(project_root, "training")
+        if training_dir not in sys.path:
+            sys.path.insert(0, training_dir)
+        import rel_component
+        log("🧩 Registered custom 'relation_extractor' component from training/rel_component.py")
+    except Exception as e:
+        log(f"ℹ️ Custom relation_extractor not registered (NER-only fallback): {e}")
+
     nlp = spacy.load(model_path)
     
     log(f"📄 Reading {input_path} ...")
