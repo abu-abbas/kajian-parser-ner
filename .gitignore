@@ -22,3 +22,6 @@ output_parsed*.json
 
 # OS files
 .DS_Store
+
+# IDEs
+.vscode/
