@@ -1,0 +1,24 @@
+# Qwen Cache
+.ex-qwen
+
+# Virtual Environment
+venv/
+.venv/
+env/
+
+# Python Cache
+**/__pycache__/
+*.py[cod]
+*$py.class
+
+# SpaCy Binary Data & Models
+*.spacy
+output_model/
+
+# Dynamic Outputs
+output-sample/
+*_output_parsed.json
+output_parsed*.json
+
+# OS files
+.DS_Store
