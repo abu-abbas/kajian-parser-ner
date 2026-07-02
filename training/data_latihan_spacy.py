@@ -62,7 +62,7 @@ TRAIN_DATA = [
         'TUJUAN HIDUP MUSLIM SETIAP HARI\n\nUstadz Abdurrahman Keken, Lc., M.H  حفظه الله\n\n°°°\n\nNikmati fitur - fitur seperti Televisi Streaming AshiilTV, informasi seputar Lokasi Masjid, Informasi Kajian, Artikel Harian, Hadist. Fiqih, dan panduan ibadah lainnya di Ashiilapp, download sekarang di :\n\n👉🏻 https://bit.ly/ashiilapp\n\n°°°\nInfaq Untuk Operasional Dakwah Ashiiltv\n\nTransfer ke rekening :\n🏧 BANK SYARIAH INDONESIA\na/n : ASHIIL CAHAYA TAUHID\nNo. Rek : 81 755 0707 9\nKode Bank : 451\n\nKonfirmasi transfer :\n📱 1. 0812-70805555 / wa.me/6281270805555\n📱 2. 0811-7550606 / wa.me/628117550606\n\nبارك الله فيكم وفي أموالكم\nSemoga Bermanfaat\n#salaf #dakwah #sunnah #islam #ashiiltv\n',
         {"entities": [
             (0, 31, "TEMA"),  # 'TUJUAN HIDUP MUSLIM SETIAP HARI'
-            (33, 66, "PEMATERI"),  # 'Ustadz Abdurrahman Keken, Lc., M.'
+            (33, 67, "PEMATERI"),  # 'Ustadz Abdurrahman Keken, Lc., M.H'
             (69, 78, "TARADHI"),  # 'حفظه الله'
             (294, 318, "LINK_STREAMING"),  # 'https://bit.ly/ashiilapp'
             (390, 414, "BANK"),  # 'BANK SYARIAH INDONESIA\\na'

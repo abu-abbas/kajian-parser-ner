@@ -7,14 +7,18 @@ into SpaCy's binary .spacy format (train.spacy and dev.spacy) for training.
 """
 
 import os
+import sys
 import random
 import spacy
 from spacy.tokens import DocBin
 
-try:
-    from data_latihan_spacy import TRAIN_DATA
-except ImportError:
-    from training.data_latihan_spacy import TRAIN_DATA
+# Pastikan direktori `training/` selalu masuk ke sys.path
+# agar `data_latihan_spacy` bisa diimpor baik dari root maupun subfolder.
+_TRAINING_DIR = os.path.dirname(os.path.abspath(__file__))
+if _TRAINING_DIR not in sys.path:
+    sys.path.insert(0, _TRAINING_DIR)
+
+from data_latihan_spacy import TRAIN_DATA
 
 def convert(data, output_path, nlp):
     db = DocBin()
@@ -34,7 +38,7 @@ def convert(data, output_path, nlp):
                 skipped += 1
             else:
                 ents.append(span)
-        
+
         # Resolve overlaps just in case (keep longer spans or first spans)
         try:
             doc.ents = ents
@@ -43,7 +47,7 @@ def convert(data, output_path, nlp):
         except Exception as e:
             print(f"  ❌ Error adding Doc Entry {i+1}: {e}")
             skipped += 1
-            
+
     db.to_disk(output_path)
     print(f"  ✅ Saved {success} documents to {output_path} (entities skipped: {skipped})")
 
@@ -51,7 +55,7 @@ def main():
     print("=" * 60)
     print("📦 SpaCy Dataset Converter & Train/Dev Splitter")
     print("=" * 60)
-    
+
     # 1. Load empty Indonesian language model for tokenization
     try:
         nlp = spacy.blank("id")
@@ -77,10 +81,10 @@ def main():
     # 4. Convert and save
     print("🔄 Converting Train set...")
     convert(train_data, "training/train.spacy", nlp)
-    
+
     print("🔄 Converting Dev set...")
     convert(dev_data, "training/dev.spacy", nlp)
-    
+
     print("=" * 60)
     print("🎯 Preparation Complete! Next steps:")
     print("   1. Install spacy (if not done yet):")

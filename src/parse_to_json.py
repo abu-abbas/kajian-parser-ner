@@ -12,6 +12,7 @@ import os
 import re
 import json
 import spacy
+from typing import Any
 
 # ═════════════════════════════════════════════════════════════
 # Session Splitting Logic (adapted from generate_dataset.py)
@@ -122,9 +123,9 @@ def extract_address_from_text(text):
 
 
 
-def structure_session(doc):
+def structure_session(doc) -> dict[str, Any]:
     """Convert SpaCy doc entities into a structured dictionary."""
-    session_data = {
+    session_data: dict[str, Any] = {
         "sesi": None,
         "pemateri": None,
         "tema": None,

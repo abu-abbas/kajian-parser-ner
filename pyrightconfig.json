@@ -1,4 +1,19 @@
 {
     "venvPath": ".",
-    "venv": "venv"
+    "venv": "venv",
+    "extraPaths": [
+        ".",
+        "src",
+        "training"
+    ],
+    "executionEnvironments": [
+        {
+            "root": ".",
+            "extraPaths": [
+                ".",
+                "src",
+                "training"
+            ]
+        }
+    ]
 }
